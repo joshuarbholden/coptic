@@ -12,8 +12,8 @@ Column[] columns = new Column[numcols];
 
 public void setup() {
   smooth();
-  size(600, 1500);
-
+  //  size(600, 1500);
+  fullScreen();
 
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
@@ -76,7 +76,7 @@ class Column {
     }
     fill(FG);
     textAlign(LEFT, BOTTOM);
-    textSize(32);
+    textSize(24);
     text(str(twist), xpos, ypos+blockheight);
   }
 
@@ -89,10 +89,12 @@ class Column {
       twist = twist - 1;
     }
     ypos = ypos + blockheight;
-    if (ypos >= height) {
-      if (xpos == 0) {
-        background(200);
-      }
+    if (ypos > height-blockheight) {
+      //      if (xpos == 0) {
+      //        background(200);
+      //      }
+      xpos = xpos + (2*numcols+1)*blockwidth;
+      xflipped = xflipped + (2*numcols+1)*blockwidth;
       ypos = 0;
     }
   }
