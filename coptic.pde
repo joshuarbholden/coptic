@@ -21,6 +21,7 @@ public void setup() {
   }
 }
 
+
 void draw() {
   for (int i = 0; i < numcols; i = i+1) {
     columns[i].step();
