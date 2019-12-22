@@ -7,7 +7,8 @@ int blockwidth = 50;
 int blockheight = 75;
 int numcols = 4;
 
-// Example: Two Column objects
+int yOffset = 4*blockheight;
+
 Column[] columns = new Column[numcols];
 
 public void setup() {
@@ -17,7 +18,7 @@ public void setup() {
 
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
-    columns[i] = new Column(color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0);
+    columns[i] = new Column(color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset);
   }
 }
 
@@ -47,16 +48,18 @@ class Column {
   float xpos;
   float xflipped;
   float ypos;
+  float yflipped;
   int twist;
   boolean Zslash;
 
   // The Constructor is defined with arguments.
-  Column(color tempBG, color tempFG, float tempXpos, float tempXflipped, float tempYpos) { 
+  Column(color tempBG, color tempFG, float tempXpos, float tempXflipped, float tempYpos, float tempYflipped) { 
     BG = tempBG;
     FG = tempFG;
     xpos = tempXpos;
     xflipped = tempXflipped;
     ypos = tempYpos-blockheight;
+    yflipped = tempYflipped-blockheight;
     twist = 0;
   }
 
@@ -64,15 +67,15 @@ class Column {
     fill(BG);
     strokeWeight(1);
     rect(xpos, ypos, blockwidth, blockheight);
-    rect(xflipped- blockwidth, ypos, blockwidth, blockheight);
+    rect(xflipped- blockwidth, yflipped, blockwidth, blockheight);
     stroke(FG);
     strokeWeight(4);
     if (Zslash) {
       line(xpos, ypos, xpos+blockwidth, ypos+blockheight);
-      line(xflipped, ypos, xflipped-blockwidth, ypos+blockheight);
+      line(xflipped, yflipped, xflipped-blockwidth, yflipped+blockheight);
     } else {
       line(xpos+blockwidth, ypos, xpos, ypos+blockheight);
-      line(xflipped-blockwidth, ypos, xflipped, ypos+blockheight);
+      line(xflipped-blockwidth, yflipped, xflipped, yflipped+blockheight);
     }
     fill(FG);
     textAlign(LEFT, BOTTOM);
@@ -94,8 +97,12 @@ class Column {
       //        background(200);
       //      }
       xpos = xpos + (2*numcols+1)*blockwidth;
-      xflipped = xflipped + (2*numcols+1)*blockwidth;
       ypos = 0;
+    }
+    yflipped = yflipped + blockheight;
+    if (yflipped > height-blockheight) {
+      xflipped = xflipped + (2*numcols+1)*blockwidth;
+      yflipped = 0;
     }
   }
 }
