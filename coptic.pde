@@ -7,19 +7,19 @@ int blockwidth = 50;
 int blockheight = 75;
 int numcols = 4;
 
-int yOffset = 4*blockheight;
+int yOffset = 2;
 
 Column[] columns = new Column[numcols];
 
 public void setup() {
   smooth();
-  //  size(600, 1500);
-  fullScreen();
-
+  size(1300, 900);
+  // fullScreen();
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
-    columns[i] = new Column(color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset);
+    columns[i] = new Column(color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight);
   }
+  noLoop();
 }
 
 
@@ -55,13 +55,22 @@ class Column {
   // The Constructor is defined with arguments.
   Column(color tempBG, color tempFG, float tempXpos, float tempXflipped, float tempYpos, float tempYflipped) { 
     BG = tempBG;
-    FG = tempFG;
+    FG = tempFG; 
     xpos = tempXpos;
     xflipped = tempXflipped;
-    ypos = tempYpos-blockheight;
-    yflipped = tempYflipped-blockheight;
+    //ypos = tempYpos-blockheight;
+    ypos = 2*tempYpos-tempYflipped-blockheight;
+    //yflipped = tempYflipped-blockheight;
+    yflipped = tempYpos-blockheight;
     twist = 0;
+    while (ypos < tempYpos-blockheight) {
+      dummystep(true);
+      display();
+      dummystep(false);
+      display();
+    }
   }
+
 
   void display() {
     fill(BG);
@@ -91,6 +100,24 @@ class Column {
       Zslash = false;
       twist = twist - 1;
     }
+    ypos = ypos + blockheight;
+    if (ypos > height-blockheight) {
+      //      if (xpos == 0) {
+      //        background(200);
+      //      }
+      xpos = xpos + (2*numcols+1)*blockwidth;
+      ypos = 0;
+    }
+    yflipped = yflipped + blockheight;
+    if (yflipped > height-blockheight) {
+      xflipped = xflipped + (2*numcols+1)*blockwidth;
+      yflipped = 0;
+    }
+  }
+
+
+  void dummystep(boolean tempZslash) {
+    Zslash = tempZslash;
     ypos = ypos + blockheight;
     if (ypos > height-blockheight) {
       //      if (xpos == 0) {
