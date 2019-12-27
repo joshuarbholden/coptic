@@ -1,4 +1,4 @@
- //<>//
+ //<>// //<>// //<>// //<>// //<>//
 
 
 // Global parameters
@@ -7,19 +7,21 @@ int blockwidth = 50;
 int blockheight = 75;
 
 int numcols = 4;
-int radius = 1;
+int radius = 0;
 
 int yOffset = 2;
+
+int yLength = 22;
 
 Column[] columns = new Column[numcols];
 
 public void setup() {
   smooth();
-  size(1300, 900);
+  size(1300, 1500);
   // fullScreen();
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
-    columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight);
+    columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight, yLength*blockheight);
   }
   noLoop();
 }
@@ -46,27 +48,24 @@ void keyPressed() {
 // No matter how many cookies we make, only one cookie cutter is needed.
 class Column { 
   int index;
-  color BG;
-  color FG;  
-  float xpos;
-  float xflipped;
-  float ypos;
-  float yflipped;
+  color BG, FG;  
+  float xpos, xflipped, ypos, yflipped;
+  float xend, xflippedend, yend, yflippedend;
   int twist;
   int effectiveTwist;
   boolean Zslash;
 
   // The Constructor is defined with arguments.
-  Column(int tempIndex, color tempBG, color tempFG, float tempXpos, float tempXflipped, float tempYpos, float tempYflipped) { 
+  Column(int tempIndex, color tempBG, color tempFG, float tempXpos, float tempXflipped, float tempYpos, float tempYflipped, float tempYend) { 
     index = tempIndex;  
     BG = tempBG;
     FG = tempFG; 
     xpos = tempXpos;
     xflipped = tempXflipped;
-    //ypos = tempYpos-blockheight;
     ypos = 2*tempYpos-tempYflipped-blockheight; //backup so that dummy fill doesn't show and one more for fencepost
-    //yflipped = tempYflipped-blockheight;
     yflipped = tempYpos-blockheight; //start dummy fill one before for fencepost
+    yend = tempYend + tempYpos - tempYflipped + blockheight; //reverse backup so that dummy fill doesn't show and one more for fencepost
+    yflippedend = tempYend + blockheight; //start dummy fill one (reverse before) for fencepost
     twist = 0;
     effectiveTwist = 0;
     while (ypos < tempYpos-blockheight) {
@@ -110,22 +109,30 @@ class Column {
       xflipped = xflipped + (2*numcols+1)*blockwidth;
       yflipped = 0;
     }
+    yend = yend - blockheight;
+    yflippedend = yflippedend - blockheight;
   }
 
 
   void display() {
     fill(BG);
+    stroke(FG);
     strokeWeight(1);
     rect(xpos, ypos, blockwidth, blockheight);
-    rect(xflipped- blockwidth, yflipped, blockwidth, blockheight);
-    stroke(FG);
+    rect(xflipped-blockwidth, yflipped, blockwidth, blockheight);
+    rect(xpos, yend-blockheight, blockwidth, blockheight);
+    rect(xflipped-blockwidth, yflippedend-blockheight, blockwidth, blockheight); 
     strokeWeight(4);
     if (Zslash) {
       line(xpos, ypos, xpos+blockwidth, ypos+blockheight);
       line(xflipped, yflipped, xflipped-blockwidth, yflipped+blockheight);
+      line(xpos, yend, xpos+blockwidth, yend-blockheight);
+      line(xflipped, yflippedend, xflipped-blockwidth, yflippedend-blockheight);
     } else {
       line(xpos+blockwidth, ypos, xpos, ypos+blockheight);
       line(xflipped-blockwidth, yflipped, xflipped, yflipped+blockheight);
+      line(xpos+blockwidth, yend, xpos, yend-blockheight);
+      line(xflipped-blockwidth, yflippedend, xflipped, yflippedend-blockheight);
     }
     fill(FG);
     textSize(24);  
@@ -147,5 +154,7 @@ class Column {
       xflipped = xflipped + (2*numcols+1)*blockwidth;
       yflipped = 0;
     }
+    yend = yend - blockheight;
+    yflippedend = yflippedend - blockheight;
   }
 }
