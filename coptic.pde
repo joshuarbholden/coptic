@@ -1,7 +1,4 @@
- //<>// //<>// //<>// //<>// //<>//
-
-
-// Global parameters
+// Global parameters //<>// //<>//
 
 int blockwidth = 50;
 int blockheight = 75;
@@ -11,17 +8,18 @@ int radius = 0;
 
 int yOffset = 2;
 
-int yLength = 22;
+int yLength = 12;
 
 Column[] columns = new Column[numcols];
 
 public void setup() {
   smooth();
-  size(1300, 1500);
-  // fullScreen();
+  size(1200, 900);
+  //fullScreen();
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
     columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight, yLength*blockheight);
+    println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
   }
   noLoop();
 }
@@ -29,8 +27,13 @@ public void setup() {
 
 void draw() {
   for (int i = 0; i < numcols; i = i+1) {
+    columns[i].setTwist();
     columns[i].step();
-    columns[i].display();
+    if (columns[i].ypos < columns[i].yend) {     
+      columns[i].leftDisplay();
+      columns[i].rightDisplay();
+      println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
+    }
   }
   noLoop();
 }
@@ -64,15 +67,19 @@ class Column {
     xflipped = tempXflipped;
     ypos = 2*tempYpos-tempYflipped-blockheight; //backup so that dummy fill doesn't show and one more for fencepost
     yflipped = tempYpos-blockheight; //start dummy fill one before for fencepost
-    yend = tempYend + tempYpos - tempYflipped + blockheight; //reverse backup so that dummy fill doesn't show and one more for fencepost
-    yflippedend = tempYend + blockheight; //start dummy fill one (reverse before) for fencepost
+    yflippedend = tempYend - tempYpos + tempYflipped + blockheight; //reverse backup so that dummy fill doesn't show and one more for fencepost
+    yend = tempYend + blockheight; //start dummy fill one (reverse before) for fencepost
     twist = 0;
     effectiveTwist = 0;
     while (ypos < tempYpos-blockheight) {
-      dummystep(true);
-      display();
-      dummystep(false);
-      display();
+      Zslash = true;
+      step();
+      rightDisplay();
+      println(index, ypos, yflipped, yend, yflippedend);
+      Zslash = false;
+      step();
+      rightDisplay();
+      println(index, ypos, yflipped, yend, yflippedend);
     }
   }
 
@@ -90,7 +97,7 @@ class Column {
     return normTwist*Integer.signum(twist);
   }
 
-  void step() {
+  void setTwist() {
     effectiveTwist = nbhdTwist(radius);
     if (random(0, 1)<threshhold(effectiveTwist)) {
       Zslash = true;
@@ -99,6 +106,9 @@ class Column {
       Zslash = false;
       twist = twist - 1;
     }
+  }
+
+  void step() {
     ypos = ypos + blockheight;
     if (ypos > height-blockheight) { // wrap to next set of columns
       xpos = xpos + (2*numcols+1)*blockwidth;
@@ -114,24 +124,18 @@ class Column {
   }
 
 
-  void display() {
+  void leftDisplay() {
     fill(BG);
     stroke(FG);
     strokeWeight(1);
     rect(xpos, ypos, blockwidth, blockheight);
-    rect(xflipped-blockwidth, yflipped, blockwidth, blockheight);
-    rect(xpos, yend-blockheight, blockwidth, blockheight);
     rect(xflipped-blockwidth, yflippedend-blockheight, blockwidth, blockheight); 
     strokeWeight(4);
     if (Zslash) {
       line(xpos, ypos, xpos+blockwidth, ypos+blockheight);
-      line(xflipped, yflipped, xflipped-blockwidth, yflipped+blockheight);
-      line(xpos, yend, xpos+blockwidth, yend-blockheight);
       line(xflipped, yflippedend, xflipped-blockwidth, yflippedend-blockheight);
     } else {
       line(xpos+blockwidth, ypos, xpos, ypos+blockheight);
-      line(xflipped-blockwidth, yflipped, xflipped, yflipped+blockheight);
-      line(xpos+blockwidth, yend, xpos, yend-blockheight);
       line(xflipped-blockwidth, yflippedend, xflipped, yflippedend-blockheight);
     }
     fill(FG);
@@ -142,19 +146,19 @@ class Column {
     text(str(effectiveTwist), xpos+blockwidth, ypos+blockheight);
   }
 
-  void dummystep(boolean tempZslash) {
-    Zslash = tempZslash;
-    ypos = ypos + blockheight;
-    if (ypos > height-blockheight) {  // wrap to next set of columns
-      xpos = xpos + (2*numcols+1)*blockwidth;
-      ypos = 0;
+  void rightDisplay() {
+    fill(BG);
+    stroke(FG);
+    strokeWeight(1);
+    rect(xflipped-blockwidth, yflipped, blockwidth, blockheight);
+    rect(xpos, yend-blockheight, blockwidth, blockheight);
+    strokeWeight(4);
+    if (Zslash) {
+      line(xflipped, yflipped, xflipped-blockwidth, yflipped+blockheight);
+      line(xpos, yend, xpos+blockwidth, yend-blockheight);
+    } else {
+      line(xflipped-blockwidth, yflipped, xflipped, yflipped+blockheight);
+      line(xpos+blockwidth, yend, xpos, yend-blockheight);
     }
-    yflipped = yflipped + blockheight;
-    if (yflipped > height-blockheight) {  // wrap to next set of columns
-      xflipped = xflipped + (2*numcols+1)*blockwidth;
-      yflipped = 0;
-    }
-    yend = yend - blockheight;
-    yflippedend = yflippedend - blockheight;
   }
 }
