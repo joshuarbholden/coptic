@@ -5,20 +5,22 @@ int blockheight = 75;
 
 int numcols = 4;
 int radius = 0;
+int maxtwist = 8;
 
 int yOffset = 2;
 
-int yLength = 12;
+int yLength = 20;
 
 Column[] columns = new Column[numcols];
 
-public void setup() {
+
+void setup() {
   smooth();
   size(1200, 900);
   //fullScreen();
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
-    columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight, yLength*blockheight);
+    columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight, yLength*blockheight-1);
     println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
   }
   noLoop();
@@ -29,10 +31,10 @@ void draw() {
   for (int i = 0; i < numcols; i = i+1) {
     columns[i].setTwist();
     columns[i].step();
+    println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
     if (columns[i].ypos < columns[i].yend) {     
       columns[i].leftDisplay();
       columns[i].rightDisplay();
-      println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
     }
   }
   noLoop();
@@ -86,7 +88,7 @@ class Column {
 
 
   float threshhold(int twistVal) {
-    return 0.5-0.0625*twistVal;
+    return 0.5-(0.5/maxtwist)*twistVal;
   }
 
   int nbhdTwist(int radiusVal) {
@@ -110,21 +112,35 @@ class Column {
 
   void step() {
     ypos = ypos + blockheight;
-    if (ypos > height-blockheight) { // wrap to next set of columns
-      xpos = xpos + (2*numcols+1)*blockwidth;
-      ypos = 0;
-    }
+    //if (ypos > height-blockheight) { // wrap to next set of columns
+    //  xpos = xpos + (2*numcols+1)*blockwidth;
+    //  ypos = 0;
+    //}
     yflipped = yflipped + blockheight;
-    if (yflipped > height-blockheight) {  // wrap to next set of columns
-      xflipped = xflipped + (2*numcols+1)*blockwidth;
-      yflipped = 0;
-    }
+    //if (yflipped > height-blockheight) {  // wrap to next set of columns
+    //  xflipped = xflipped + (2*numcols+1)*blockwidth;
+    //  yflipped = 0;
+    //}
     yend = yend - blockheight;
     yflippedend = yflippedend - blockheight;
   }
 
 
+  float Xadjusted(float X, float Y) {
+    float adjustedHeight = floor(height/blockheight)*blockheight;
+    return X + floor(Y/adjustedHeight) * (2*numcols+1)*blockwidth;
+  }
+
+  float Yadjusted(float X, float Y) {
+    float adjustedHeight = floor(height/blockheight)*blockheight;
+    return Y % adjustedHeight;
+  }
+
   void leftDisplay() {
+    float xpos = Xadjusted(this.xpos, this.ypos);
+    float ypos = Yadjusted(this.xpos, this.ypos);
+    float xflipped = Xadjusted(this.xflipped, this.yflippedend);
+    float yflippedend = Yadjusted(this.xflipped, this.yflippedend);
     fill(BG);
     stroke(FG);
     strokeWeight(1);
@@ -147,6 +163,10 @@ class Column {
   }
 
   void rightDisplay() {
+    float xpos = Xadjusted(this.xpos, this.yend);
+    float yend = Yadjusted(this.xpos, this.yend);
+    float xflipped = Xadjusted(this.xflipped, this.yflipped);
+    float yflipped = Yadjusted(this.xflipped, this.yflipped);
     fill(BG);
     stroke(FG);
     strokeWeight(1);
