@@ -7,23 +7,23 @@ int numcols = 4;
 int radius = 0;
 int maxtwist = 8;
 
-int yOffset = 2;
+int yOffset = 0;
 
-int yLength = 20;
+int yLength = 12;
 
 Column[] columns = new Column[numcols];
 
 
 void setup() {
   smooth();
-  size(1200, 900);
+  size(400, 900);
   //fullScreen();
   // Parameters go inside the parentheses when the object is constructed.
   for (int i = 0; i < numcols; i = i+1) {
     columns[i] = new Column(i, color(255, 255, 0), color(50, 100, 50), i*blockwidth, (2*numcols-i)*blockwidth, 0, yOffset*blockheight, yLength*blockheight-1);
     println(columns[i].ypos, columns[i].yflipped, columns[i].yend, columns[i].yflippedend);
   }
-  noLoop();
+  //  noLoop();
 }
 
 
@@ -37,7 +37,7 @@ void draw() {
       columns[i].rightDisplay();
     }
   }
-  noLoop();
+  //  noLoop();
 }
 
 void keyPressed() {
@@ -157,9 +157,9 @@ class Column {
     fill(FG);
     textSize(24);  
     textAlign(LEFT, BOTTOM);
-    text(str(twist), xpos, ypos+blockheight);
+    //text(str(twist), xpos, ypos+blockheight);
     textAlign(RIGHT, BOTTOM);
-    text(str(effectiveTwist), xpos+blockwidth, ypos+blockheight);
+    //text(str(effectiveTwist), xpos+blockwidth, ypos+blockheight);
   }
 
   void rightDisplay() {
