@@ -157,7 +157,7 @@ class Column {
     fill(FG);
     textSize(24);  
     textAlign(LEFT, BOTTOM);
-    //text(str(twist), xpos, ypos+blockheight);
+    text(str(twist), xpos, ypos+blockheight);
     textAlign(RIGHT, BOTTOM);
     //text(str(effectiveTwist), xpos+blockwidth, ypos+blockheight);
   }
@@ -180,5 +180,11 @@ class Column {
       line(xflipped-blockwidth, yflipped, xflipped, yflipped+blockheight);
       line(xpos+blockwidth, yend, xpos, yend-blockheight);
     }
+    fill(FG);
+    textSize(24);  
+    textAlign(LEFT, TOP);
+    text(str(twist), xpos, yend-blockheight);
+    textAlign(RIGHT, BOTTOM);
+    //text(str(effectiveTwist), xpos+blockwidth, ypos+blockheight);
   }
 }
